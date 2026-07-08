@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HTH Masternodes — stake.HTH.foundation</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="dashboard">
+  <header class="site">
+    <div class="brand"><span class="dot"></span> HTH Masternodes</div>
+    <nav>
+      <a href="index.html" class="active">Dashboard</a>
+      <a href="setup.html">Set up a node</a>
+      <a href="guide.html">Guide</a>
+      <a href="https://hth.foundation">hth.foundation</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>HelpTheHomeless Masternode Dashboard</h1>
+    <p class="sub">Self-hosted &amp; non-custodial. You keep your 1,000,000 HTH collateral and run your own node — this dashboard just helps you set it up and watch the network. Your keys never touch this site.</p>
+
+    <div id="dash-err" class="warnbox" style="display:none"></div>
+    <div id="stats" class="grid"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Look up a masternode</h2>
+      <p class="muted">Search by collateral outpoint (<code>txid-index</code>), IP address, or payee address.</p>
+      <form id="lookup-form" style="display:flex; gap:10px; flex-wrap:wrap">
+        <input id="lookup-key" placeholder="e.g. 1.2.3.4  or  a1b2c3…-0" style="flex:1; min-width:240px" />
+        <button type="submit">Search</button>
+      </form>
+      <pre class="out" id="lookup-out" style="display:none; margin-top:14px"></pre>
+    </div>
+
+    <h2>Active masternodes</h2>
+    <div id="list-err" class="warnbox" style="display:none"></div>
+    <div class="card table-wrap" id="mn-table">
+      <table>
+        <thead><tr><th>Address / outpoint</th><th>Status</th><th>Active</th><th>Payee</th></tr></thead>
+        <tbody><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site">
+    stake.HTH.foundation · Help The Homeless Coin (HTH) · x25x · 60s blocks · 1,000,000 collateral · ChainLocks
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

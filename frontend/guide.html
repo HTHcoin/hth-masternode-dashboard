@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Masternode guide — stake.HTH.foundation</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="guide">
+  <header class="site">
+    <div class="brand"><span class="dot"></span> HTH Masternodes</div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="setup.html">Set up a node</a>
+      <a href="guide.html" class="active">Guide</a>
+      <a href="https://hth.foundation">hth.foundation</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>How to run an HTH masternode</h1>
+    <p class="sub">A masternode requires <strong>1,000,000 HTH</strong> collateral held in a wallet you control, plus a small always-on VPS running the HTH node. You keep custody of the coins the entire time — the collateral only needs to <em>stay put</em>; it is never sent to anyone.</p>
+
+    <div class="warnbox"><strong>You need two machines:</strong> a <em>control wallet</em> (your desktop, holds the 1,000,000 HTH) and a <em>remote node</em> (a cheap 1–2 GB VPS with a static public IP). The private key generated for the node controls no funds.</div>
+
+    <h2>Step by step</h2>
+    <ol class="steps">
+      <li><strong>Fund the collateral.</strong> In your control wallet, create a fresh receiving address and send it <strong>exactly 1,000,000 HTH</strong> in a single transaction. Wait for ~15 confirmations.</li>
+
+      <li><strong>Get the collateral outpoint.</strong> In the wallet's Debug Console:
+        <pre class="out" data-copy="masternode outputs">masternode outputs</pre>
+        This returns a <code>txid</code> and an output <code>index</code> (0 or 1).</li>
+
+      <li><strong>Generate the masternode key.</strong> Either run this on the control wallet, or let the VPS installer print one for you:
+        <pre class="out" data-copy="masternode genkey">masternode genkey</pre></li>
+
+      <li><strong>Provision the VPS.</strong> Open the <a href="setup.html">Set up a node</a> page, fill in your alias, VPS IP, the masternode key, and the collateral txid/index. Copy the generated one-line installer and run it on your VPS as root. It installs the daemon, writes <code>helpthehomeless.conf</code>, opens port <strong>65000</strong>, and starts a systemd service.</li>
+
+      <li><strong>Register on the control wallet.</strong> Add the generated line to <code>~/.helpthehomeless/masternode.conf</code>, restart the wallet, then start the node:
+        <pre class="out" data-copy="masternode start-alias mn1">masternode start-alias &lt;alias&gt;</pre></li>
+
+      <li><strong>Verify.</strong> On the VPS: <code>helpthehomeless-cli masternode status</code> should read <em>"Masternode successfully started"</em>. Then find it on the <a href="index.html">Dashboard</a> — status <span class="badge ok">ENABLED</span> means it's earning.</li>
+    </ol>
+
+    <h2>Keeping it healthy</h2>
+    <ul>
+      <li>The VPS node must stay online 24/7 and fully synced, or the network will drop it to <span class="badge bad">EXPIRED / NEW_START_REQUIRED</span>.</li>
+      <li>Do <strong>not</strong> move or spend the 1,000,000 HTH — spending the collateral immediately removes the masternode.</li>
+      <li>After a daemon upgrade, re-run <code>masternode status</code> and, if needed, <code>start-alias</code> again.</li>
+    </ul>
+
+    <p class="muted" style="margin-top:28px">Chain: x25x PoW · 60-second blocks · 1,000,000 HTH collateral · ChainLocks. Support: Discord <code>nucash</code>.</p>
+  </main>
+
+  <footer class="site">stake.HTH.foundation</footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
