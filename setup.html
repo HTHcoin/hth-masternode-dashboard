@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Set up a masternode — stake.HTH.foundation</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="setup">
+  <header class="site">
+    <div class="brand"><span class="dot"></span> HTH Masternodes</div>
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="setup.html" class="active">Set up a node</a>
+      <a href="guide.html">Guide</a>
+      <a href="https://hth.foundation">hth.foundation</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Set up your masternode</h1>
+    <p class="sub">Fill in the fields below. Everything is generated <strong>in your browser</strong> — nothing is sent to any server. Follow the <a href="guide.html">full guide</a> if a value is unfamiliar.</p>
+
+    <div class="warnbox">
+      <strong>Non-custodial.</strong> The 1,000,000 HTH collateral stays in <em>your</em> control wallet.
+      Never paste your wallet seed or the collateral wallet's private key here — you only need the
+      <em>masternode</em> private key (from <code>masternode genkey</code>), which controls no funds.
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Alias <span class="muted">(any label)</span></label>
+          <input id="alias" placeholder="mn1" />
+        </div>
+        <div>
+          <label>VPS public IP</label>
+          <input id="ip" placeholder="203.0.113.10" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Masternode private key <span class="muted">(<code>masternode genkey</code>)</span></label>
+          <input id="mnkey" placeholder="7xX…  (controls no funds)" />
+          <div class="hint">Run <code>helpthehomeless-cli masternode genkey</code> — the installer below can also print it for you.</div>
+        </div>
+        <div>
+          <label>Collateral txid</label>
+          <input id="txid" placeholder="from: masternode outputs" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Collateral output index</label>
+          <input id="txindex" placeholder="0 or 1" />
+        </div>
+        <div>
+          <label>P2P port</label>
+          <input id="port" value="65000" />
+        </div>
+      </div>
+      <div style="margin-top:18px"><button onclick="generate()">Generate config</button></div>
+    </div>
+
+    <div id="results" style="display:none">
+      <h2>1 · <code>masternode.conf</code> line (on your control wallet)</h2>
+      <p class="muted">Add this single line to <code>~/.helpthehomeless/masternode.conf</code>, then restart the wallet and run <code>masternode start-alias &lt;alias&gt;</code>.</p>
+      <pre class="out" id="out-conf"></pre>
+
+      <h2>2 · <code>helpthehomeless.conf</code> (on the remote VPS node)</h2>
+      <pre class="out" id="out-vpsconf"></pre>
+
+      <h2>3 · One-line VPS installer</h2>
+      <p class="muted">SSH into your fresh Ubuntu VPS as root and run:</p>
+      <pre class="out" id="out-install"></pre>
+      <p class="muted">The installer downloads the HTH daemon, writes the config above, opens port <span id="port-echo">65000</span>, and starts the node as a systemd service. Then finish from your control wallet with <code>masternode start-alias &lt;alias&gt;</code>.</p>
+    </div>
+  </main>
+
+  <footer class="site">stake.HTH.foundation · generated locally in your browser</footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    function generate() {
+      const v = (id) => document.getElementById(id).value.trim();
+      const alias = v('alias') || 'mn1', ip = v('ip'), key = v('mnkey');
+      const txid = v('txid'), idx = v('txindex'), port = v('port') || '65000';
+      if (!ip || !key) { alert('VPS IP and masternode private key are required.'); return; }
+
+      document.getElementById('out-conf').textContent =
+        `${alias} ${ip}:${port} ${key} ${txid || '<COLLATERAL_TXID>'} ${idx || '<INDEX>'}`;
+
+      document.getElementById('out-vpsconf').textContent =
+        [ 'rpcuser=hthrpc',
+          'rpcpassword=' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2),
+          'server=1', 'daemon=1', 'listen=1', 'maxconnections=64',
+          'masternode=1', `externalip=${ip}`, `masternodeprivkey=${key}`,
+        ].join('\n');
+
+      const url = window.HTH_STAKE_CONFIG.INSTALL_SCRIPT_URL;
+      document.getElementById('out-install').textContent =
+        `curl -fsSL ${url} | sudo bash -s -- "${key}" "${ip}" "${port}"`;
+      document.getElementById('port-echo').textContent = port;
+
+      document.getElementById('results').style.display = 'block';
+      wireCopy();
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
